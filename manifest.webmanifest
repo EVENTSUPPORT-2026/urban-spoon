@@ -1,0 +1,10 @@
+{
+  "name": "Event Support BFN \u2014 Site Inspection",
+  "short_name": "ESB Site Inspection",
+  "description": "Event Support BFN event site safety inspection app.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#10243e",
+  "orientation": "portrait"
+}

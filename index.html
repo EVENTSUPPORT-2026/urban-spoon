@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Support BFN — Site Inspection</title>
+<style>
+:root{--navy:#10243e;--pink:#e85b91;--bg:#f4f6f8;--card:#fff;--muted:#667085;--line:#d9dee7;--green:#17834b;--amber:#b7791f;--red:#c53030}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#182230}
+header{background:var(--navy);color:#fff;padding:18px 20px;position:sticky;top:0;z-index:5}
+header b{font-size:18px} header small{display:block;opacity:.75;margin-top:4px}
+main{max-width:900px;margin:auto;padding:18px 14px 90px}
+.screen{display:none}.screen.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 8px #00000008}
+h2{margin:5px 0 14px;font-size:22px}h3{margin:5px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}}
+label{font-size:13px;font-weight:bold;display:block;margin-bottom:6px}input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}textarea{min-height:80px;resize:vertical}
+.btn{border:0;border-radius:9px;padding:11px 15px;font-weight:bold;cursor:pointer;margin:4px 4px 4px 0}.primary{background:var(--pink);color:#fff}.dark{background:var(--navy);color:#fff}.light{background:#eef1f5}.danger{background:#fde8e8;color:var(--red)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.stat{display:inline-block;padding:12px 16px;background:#f0f3f7;border-radius:10px;margin:4px}.stat b{display:block;font-size:22px}.muted{color:var(--muted)}
+.check{border:1px solid var(--line);border-radius:11px;padding:12px;margin:9px 0}.checktop{display:flex;justify-content:space-between;gap:8px}.choices{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.choice{padding:7px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:#fff}.choice.selected{background:var(--navy);color:#fff;border-color:var(--navy)}
+.badge{padding:4px 8px;border-radius:20px;font-size:12px;font-weight:bold;background:#edf2f7}.open{color:var(--red)}.closed{color:var(--green)}
+footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:9px;text-align:center}
+footer button{margin:2px}
+.photo{border:1px dashed #b8c0cc;padding:18px;border-radius:10px;text-align:center;color:var(--muted)}
+.signature{height:90px;border:1px solid var(--line);border-radius:9px;background:#fff}
+.notice{padding:12px;border-radius:10px;background:#fff7df;border:1px solid #f0d78c;margin:10px 0}
+</style>
+</head>
+<body>
+<header><b>EVENT SUPPORT BFN</b><small>First Aid & Venue Support Service · Site Inspection</small></header>
+<main>
+
+<section id="dashboard" class="screen active">
+<h2>Inspection Dashboard</h2>
+<div class="card">
+<div class="stat"><b id="draftCount">0</b>Drafts</div>
+<div class="stat"><b id="submittedCount">0</b>Submitted</div>
+<div class="stat"><b id="approvedCount">0</b>Approved</div>
+<div class="stat"><b id="actionCount">0</b>Open Actions</div>
+</div>
+<div class="card">
+<h3>Start</h3>
+<button class="btn primary" onclick="newInspection()">＋ New Inspection</button>
+<button class="btn light" onclick="show('drafts');renderDrafts()">Drafts / History</button>
+</div>
+<div class="card">
+<h3>How it works</h3>
+<p class="muted">Create an inspection, complete the 20-point checklist, record findings and evidence, sign it, then submit it for manager review.</p>
+</div>
+</section>
+
+<section id="details" class="screen">
+<h2>1. Event & Inspection Details</h2>
+<div class="card"><div class="grid">
+<div><label>Event / Activity Name</label><input id="eventName"></div>
+<div><label>Client / Organiser</label><input id="client"></div>
+<div><label>Venue / Site</label><input id="venue"></div>
+<div><label>Event Date(s)</label><input id="eventDates" placeholder="e.g. 15–16 October 2026"></div>
+<div><label>Inspection Date & Time</label><input id="inspectionDate" type="datetime-local"></div>
+<div><label>Inspection Type</label><select id="inspectionType"><option>Pre-event</option><option>Follow-up</option><option>Change of setup</option><option>Other</option></select></div>
+<div><label>Inspector</label><input id="inspector"></div>
+<div><label>Designation</label><select id="designation"><option>Safety Officer</option><option>OHS Representative</option><option>SHE Representative</option><option>Other</option></select></div>
+<div><label>Client / Venue Representative</label><input id="representative"></div>
+</div></div>
+<div class="notice">This inspection records visible safety conditions observed at the time of inspection and does not replace statutory certificates, specialist inspections or authority approvals.</div>
+<div class="nav"><button class="btn light" onclick="show('dashboard')">Back</button><button class="btn primary" onclick="saveAnd('checklist')">Save & Continue</button></div>
+</section>
+
+<section id="checklist" class="screen">
+<h2>2. Site Safety Checklist</h2><div id="checklistBox"></div>
+<div class="nav"><button class="btn light" onclick="show('details')">Back</button><button class="btn primary" onclick="saveAnd('findings')">Save & Continue</button></div>
+</section>
+
+<section id="findings" class="screen">
+<h2>3. Findings & Corrective Actions</h2>
+<div id="findingBox"></div>
+<button class="btn light" onclick="addFinding()">＋ Add Finding</button>
+<div class="nav"><button class="btn light" onclick="show('checklist')">Back</button><button class="btn primary" onclick="saveAnd('photos')">Save & Continue</button></div>
+</section>
+
+<section id="photos" class="screen">
+<h2>4. Photographic / Supporting Evidence</h2>
+<div class="card">
+<label>Attach photos</label>
+<input id="photosInput" type="file" accept="image/*" multiple>
+<p class="muted">Photos are stored with this inspection on this device in this MVP.</p>
+<div id="photoList"></div>
+</div>
+<div class="nav"><button class="btn light" onclick="show('findings')">Back</button><button class="btn primary" onclick="saveAnd('outcome')">Save & Continue</button></div>
+</section>
+
+<section id="outcome" class="screen">
+<h2>5. Overall Inspection Outcome</h2>
+<div class="card"><label>Outcome</label>
+<select id="outcomeSelect"><option>Acceptable</option><option>Acceptable with Corrective Actions</option><option>Further Assessment Required</option><option>Not Acceptable at Time of Inspection</option></select>
+</div>
+<div class="card"><label>Additional comments</label><textarea id="comments"></textarea></div>
+<div class="nav"><button class="btn light" onclick="show('photos')">Back</button><button class="btn primary" onclick="saveAnd('signoff')">Save & Continue</button></div>
+</section>
+
+<section id="signoff" class="screen">
+<h2>6. Sign-Off</h2>
+<div class="grid">
+<div class="card"><h3>Inspector</h3><label>Name</label><input id="sigInspectorName"><label>Designation</label><input id="sigInspectorDesig"><label>Signature</label><div class="signature"></div></div>
+<div class="card"><h3>Client / Venue Representative</h3><label>Name</label><input id="sigClientName"><label>Designation</label><input id="sigClientDesig"><label>Signature</label><div class="signature"></div></div>
+</div>
+<div class="nav"><button class="btn light" onclick="show('outcome')">Back</button><button class="btn primary" onclick="saveAnd('review')">Review Inspection</button></div>
+</section>
+
+<section id="review" class="screen">
+<h2>7. Review & Submit</h2><div id="reviewBox"></div>
+<div class="nav"><button class="btn light" onclick="show('signoff')">Edit</button><button class="btn dark" onclick="submitInspection()">Submit to Manager</button></div>
+</section>
+
+<section id="drafts" class="screen">
+<h2>Inspections & History</h2><div id="historyBox"></div>
+<button class="btn light" onclick="show('dashboard')">Dashboard</button>
+</section>
+
+</main>
+<footer>
+<button class="btn light" onclick="show('dashboard');updateCounts()">Dashboard</button>
+<button class="btn primary" onclick="newInspection()">New Inspection</button>
+</footer>
+
+<script>
+const items=[
+"Access and egress routes clear and suitable","Emergency exits identified, accessible and adequately marked","Emergency vehicle / ambulance access available","Emergency assembly / evacuation area identified","Fire extinguishers / firefighting equipment accessible and unobstructed","First-aid point / medical post location suitable","Electrical leads, plugs, DBs and visible installations appear safe","Temporary structures / gazebos / marquees appear stable and appropriately secured","Stage / stands / barriers / spectator structures visually satisfactory","Walkways and public areas free of obvious trip hazards","Ground conditions suitable for intended activities","Lighting adequate for event areas and emergency routes","Signage / safety notices visible where required","Security / crowd-control arrangements appear adequate","Weather-related risks considered","Sanitation / ablution facilities adequate and accessible","Housekeeping / waste management satisfactory","Restricted / hazardous areas identified and controlled","Emergency contact / communication arrangements confirmed","Other site-specific hazards identified"];
+let current=null, findings=[];
+
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);if(id==='checklist')renderChecklist();if(id==='findings')renderFindings();if(id==='review')renderReview();if(id==='drafts')renderDrafts();}
+function blank(){return {id:Date.now(),doc:'ESB-OHS-SI-'+new Date().getFullYear()+'-',status:'DRAFT',details:{},checks:items.map(()=>({status:'OK',obs:''})),findings:[],photos:[],outcome:'Acceptable',comments:''};}
+function newInspection(){current=blank();findings=current.findings;setFields();show('details')}
+function setFields(){const d=current.details||{};['eventName','client','venue','eventDates','inspectionDate','inspectionType','inspector','designation','representative'].forEach(k=>{let e=document.getElementById(k);if(e)e.value=d[k]||''});document.getElementById('outcomeSelect').value=current.outcome||'Acceptable';document.getElementById('comments').value=current.comments||''}
+function collect(){let d={};['eventName','client','venue','eventDates','inspectionDate','inspectionType','inspector','designation','representative'].forEach(k=>d[k]=document.getElementById(k)?.value||'');current.details=d;current.outcome=document.getElementById('outcomeSelect')?.value||current.outcome;current.comments=document.getElementById('comments')?.value||current.comments;current.findings=findings;localStorage.setItem('esb_current',JSON.stringify(current));}
+function saveAnd(next){collect();saveCurrent();show(next)}
+function saveCurrent(){if(!current)return;localStorage.setItem('esb_current',JSON.stringify(current));let all=JSON.parse(localStorage.getItem('esb_inspections')||'[]');let i=all.findIndex(x=>x.id===current.id);if(i<0)all.push(current);else all[i]=current;localStorage.setItem('esb_inspections',JSON.stringify(all));updateCounts()}
+function renderChecklist(){let b=document.getElementById('checklistBox');b.innerHTML='';items.forEach((q,i)=>{let c=current.checks[i]||{status:'OK',obs:''};b.innerHTML+=`<div class="check"><div class="checktop"><b>${i+1}. ${q}</b></div><div class="choices">${['OK','ACTION REQUIRED','N/A'].map(s=>`<span class="choice ${c.status===s?'selected':''}" onclick="setCheck(${i},'${s}')">${s}</span>`).join('')}</div><textarea id="obs${i}" placeholder="Observation / action required">${c.obs||''}</textarea></div>`})}
+function setCheck(i,s){current.checks[i].status=s;current.checks[i].obs=document.getElementById('obs'+i)?.value||'';renderChecklist()}
+function renderFindings(){let b=document.getElementById('findingBox');b.innerHTML='';findings.forEach((f,i)=>{b.innerHTML+=`<div class="card"><h3>Finding ${i+1}</h3><label>Finding / Hazard</label><textarea onchange="findings[${i}].hazard=this.value">${f.hazard||''}</textarea><div class="grid"><div><label>Risk Level</label><select onchange="findings[${i}].risk=this.value"><option ${f.risk==='Low'?'selected':''}>Low</option><option ${f.risk==='Med'?'selected':''}>Med</option><option ${f.risk==='High'?'selected':''}>High</option></select></div><div><label>Status</label><select onchange="findings[${i}].status=this.value"><option ${f.status==='Open'?'selected':''}>Open</option><option ${f.status==='Closed'?'selected':''}>Closed</option></select></div></div><label>Corrective Action / Recommendation</label><textarea onchange="findings[${i}].action=this.value">${f.action||''}</textarea><label>Responsible Person</label><input onchange="findings[${i}].person=this.value" value="${f.person||''}"><button class="btn danger" onclick="findings.splice(${i},1);renderFindings()">Remove</button></div>`})}
+function addFinding(){findings.push({hazard:'',risk:'Low',action:'',person:'',status:'Open'});renderFindings()}
+function renderReview(){collect();let d=current.details;let actions=current.checks.filter(x=>x.status==='ACTION REQUIRED').length;document.getElementById('reviewBox').innerHTML=`<div class="card"><b>${current.doc}</b><h3>${d.eventName||'Unnamed event'}</h3><p>${d.client||''} · ${d.venue||''}</p><p><b>Checklist:</b> ${actions} action-required item(s)</p><p><b>Findings:</b> ${findings.length}</p><p><b>Outcome:</b> ${current.outcome}</p><p><b>Status:</b> ${current.status}</p></div><div class="notice">Review the information before submitting. The production version will add real signatures, photo storage, PDF generation and manager approval.</div>`}
+function submitInspection(){collect();current.status='SUBMITTED';if(!current.doc.match(/-\d{3}$/)){let all=JSON.parse(localStorage.getItem('esb_inspections')||'[]');let n=all.length+1;current.doc+=''+String(n).padStart(3,'0')}saveCurrent();alert('Inspection submitted to manager.');show('drafts');renderDrafts()}
+function renderDrafts(){let all=JSON.parse(localStorage.getItem('esb_inspections')||'[]');let b=document.getElementById('historyBox');if(!all.length){b.innerHTML='<div class="card muted">No inspections saved yet.</div>';return}b.innerHTML=all.slice().reverse().map(x=>`<div class="card"><b>${x.doc}</b><h3>${x.details?.eventName||'Unnamed event'}</h3><p>${x.details?.venue||''}</p><span class="badge">${x.status}</span><button class="btn light" onclick="openSaved(${x.id})">Open</button></div>`).join('')}
+function openSaved(id){let all=JSON.parse(localStorage.getItem('esb_inspections')||'[]');current=all.find(x=>x.id===id);if(!current)return;findings=current.findings||[];setFields();show('details')}
+function updateCounts(){let all=JSON.parse(localStorage.getItem('esb_inspections')||'[]');document.getElementById('draftCount').textContent=all.filter(x=>x.status==='DRAFT').length;document.getElementById('submittedCount').textContent=all.filter(x=>x.status==='SUBMITTED').length;document.getElementById('approvedCount').textContent=all.filter(x=>x.status==='APPROVED').length;document.getElementById('actionCount').textContent=all.reduce((n,x)=>n+(x.checks||[]).filter(c=>c.status==='ACTION REQUIRED').length,0)}
+document.getElementById('photosInput').addEventListener('change',e=>{if(!current)return;current.photos=[...(current.photos||[]),...Array.from(e.target.files).map(f=>f.name)];document.getElementById('photoList').innerHTML=current.photos.map(p=>`<div>📷 ${p}</div>`).join('');saveCurrent()});
+updateCounts();
+</script>
+<script>
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>

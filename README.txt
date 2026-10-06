@@ -1,26 +1,24 @@
-EVENT SUPPORT BFN — ANDROID PROJECT
-=====================================
+EVENT SUPPORT BFN — SITE INSPECTION APP
+=========================================
 
-This is an Android Studio project for the Event Support BFN Site Inspection app.
+This package is the installable PWA version of the Event Support BFN Site Inspection MVP.
 
-Current version:
-- Native Android shell
-- Event Support BFN branding
-- Existing site inspection MVP embedded as an offline asset
-- 20-point checklist
-- Findings/corrective actions
+Included:
+- Event and inspection details
+- 20-point safety checklist
+- Findings and corrective actions
+- Photo attachment selection
+- Inspection outcome
 - Local draft/history storage
-- Inspection submission workflow
-- Portrait phone layout
+- Review and submission workflow
+- Installable phone app structure
+- Offline cache for the app shell
 
-BUILD:
-1. Open this folder in Android Studio.
-2. Allow Gradle to sync.
-3. Connect an Android phone or choose an emulator.
-4. Run the app.
-5. To create an APK: Build > Generate App Bundles or APKs > Generate APKs.
+TESTING:
+1. Put these files on a web host that supports HTTPS.
+2. Open index.html from the hosted address on an Android phone.
+3. In Chrome, use "Add to Home screen" / "Install app".
 
 IMPORTANT:
-This project is intentionally the first APK stage. It does not yet provide cloud
-multi-user login, manager synchronization, server-side photo storage, PDF generation,
-or production digital signatures. Those are the next development stage.
+This version stores inspection data locally on the device. It is not yet the production multi-user cloud version.
+The next production stage is user login, manager accounts, cloud database, real photo storage, digital signatures, PDF generation and manager approval.
